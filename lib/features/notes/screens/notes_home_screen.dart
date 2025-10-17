@@ -7,6 +7,7 @@ import 'package:notesapp/features/notes/data/notes_service.dart';
 import 'package:notesapp/features/notes/models/note.dart';
 import 'package:notesapp/features/notes/screens/note_editor_screen.dart';
 import 'package:notesapp/features/notes/screens/widgets/note_card.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'controllers/notes_home_controller.dart';
 
@@ -24,7 +25,9 @@ class _NotesHomeScreenState extends State<NotesHomeScreen> {
   final user = FirebaseAuth.instance.currentUser;
   if (user != null) {
     await user.reload();
-    setState(() {}); // Force UI rebuild with updated displayName
+    if(mounted){
+      setState(() {});
+    } 
   }
 }
 
@@ -94,30 +97,32 @@ class _NotesHomeScreenState extends State<NotesHomeScreen> {
   }
 
   Widget _buildGrid(BuildContext context, List<Note> notes) {
-    final width = MediaQuery.of(context).size.width;
-    final crossAxisCount = width > 900
-        ? 4
-        : width > 600
-            ? 3
-            : 2;
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: notes.length,
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: crossAxisCount,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 0.85,
-      ),
-      itemBuilder: (context, index) {
-        final note = notes[index];
-        return NoteCard(
-          note: note,
-          onTap: () => _openEditor(context, note),
-          onTogglePin: () => _togglePin(context, note),
-          onDelete: () => _deleteNote(context, note),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const spacing = 16.0;
+        final width = constraints.maxWidth;
+        final crossAxisCount = width > 900
+            ? 4
+            : width > 600
+                ? 3
+                : 2;
+        return MasonryGridView.count(
+          padding: EdgeInsets.zero,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: crossAxisCount,
+          mainAxisSpacing: spacing,
+          crossAxisSpacing: spacing,
+          itemCount: notes.length,
+          itemBuilder: (context, index) {
+            final note = notes[index];
+            return NoteCard(
+              note: note,
+              onTap: () => _openEditor(context, note),
+              onTogglePin: () => _togglePin(context, note),
+              onDelete: () => _deleteNote(context, note),
+            );
+          },
         );
       },
     );

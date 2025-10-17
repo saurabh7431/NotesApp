@@ -22,22 +22,20 @@ class NoteCard extends StatelessWidget {
     final now = DateTime.now();
 
     final isEdited = updated.difference(created).inSeconds > 5;
-
     final targetDate = isEdited ? updated : created;
-
     final difference = now.difference(targetDate);
 
     String prefix = isEdited ? 'Edited' : 'Created';
 
     if (difference.inDays >= 7) {
-      return '$prefix on${updated.day}/${updated.month}/${updated.year}';
+      return '$prefix on ${updated.day}/${updated.month}/${updated.year}';
     }
     if (difference.inDays >= 1) {
       final weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      return '$prefix on${weekDays[updated.weekday - 1]}';
+      return '$prefix on ${weekDays[updated.weekday - 1]}';
     }
     final timeOfDay = TimeOfDay.fromDateTime(updated);
-    return '$prefix at${timeOfDay.format(context)}';
+    return '$prefix at ${timeOfDay.format(context)}';
   }
 
   @override
@@ -79,7 +77,7 @@ class NoteCard extends StatelessWidget {
                         if (hasContent)
                           Text(
                             note.content,
-                            maxLines: 6,
+                            maxLines: 10,
                             overflow: TextOverflow.ellipsis,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: Colors.black87,
@@ -119,6 +117,10 @@ class NoteCard extends StatelessWidget {
                       const PopupMenuItem(
                         value: 'delete',
                         child: Text('Delete'),
+                      ),
+                      const PopupMenuItem(
+                        value: 'share',
+                        child: Text('Share'),
                       ),
                     ],
                     icon: const Icon(
